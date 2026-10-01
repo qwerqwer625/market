@@ -4,47 +4,63 @@ import numpy as np
 
 # إعدادات صفحة التطبيق
 st.set_page_config(
-    page_title="تطبيق مراقبة الأسواق المالية",
-    page_icon="📈",
+    page_title="منصة مراقبة الأسواق المالية - EO Style",
+    page_icon="📊",
     layout="wide"
 )
 
-st.title("📊 لوحة تحكم ومراقبة الأسواق المالية")
-st.markdown("مرحباً بك! هذه النسخة المطورة من تطبيقك المالي التفاعلي.")
+st.title("📈 لوحة المؤشرات المالية المتقدمة")
+st.markdown("مرحباً بك! هذه النسخة المطورة والمجهزة بمؤشرات فنية تفاعلية.")
 
-# الشريط الجانبي للإعدادات
-st.sidebar.header("إعدادات العرض")
+# الشريط الجانبي للإعدادات المتقدمة
+st.sidebar.header("⚙️ إعدادات المنصة")
 asset = st.sidebar.selectbox(
-    "اختر الأصل المالي للمتابعة:",
-    ["الأسهم الأمريكية (US Stocks)", "العملات الرقمية (Crypto)", "العملات الأجنبية (Forex)", "السلع (Commodities)"]
+    "اختر الأصل المالي:",
+    ["العملات الرقمية (Crypto)", "الأسهم (Stocks)", "الفوركس (Forex)", "السلع (Commodities)"]
 )
 
 timeframe = st.sidebar.selectbox(
     "الإطار الزمني:",
-    ["اليوم (1D)", "الأسبوع (1W)", "الشهر (1M)", "السنة (1Y)"]
+    ["دقيقة (1m)", "ساعة (1h)", "يومي (1D)", "أسبوعي (1W)"]
 )
 
 st.sidebar.markdown("---")
-st.sidebar.info("التطبيق متصل ومحدث تلقائياً عبر Streamlit Cloud.")
+st.sidebar.subheader("🧮 حاسبة الصفقة السريعة")
+entry_price = st.sidebar.number_input("سعر الدخول ($)", value=150.0)
+investment = st.sidebar.number_input("مبلغ الاستثمار ($)", value=1000.0)
+target_profit = st.sidebar.slider("نسبة الهدف المستهدف (%)", 1, 50, 10)
 
-# عرض محتوى بناءً على الاختيار
-st.subheader(f"تحليل الأداء لـ: {asset} ({timeframe})")
+expected_return = investment * (target_profit / 100)
+st.sidebar.success(f"الربح المتوقع: ${expected_return:.2f}")
 
-# محاكاة بيانات مالية لتجربة الواجهة والرسوم البيانية
-chart_data = pd.DataFrame(
-    np.random.randn(20, 3) * 10 + 150,
-    columns=['السعر الأعلى', 'السعر الأدنى', 'سعر الإغلاق']
-)
+# توليد بيانات محاكاة واقعية للسعر مع مؤشرات فنية
+np.random.seed(42)
+dates = pd.date_range(start="2026-01-01", periods=30, freq="D")
+prices = 150 + np.cumsum(np.random.randn(30) * 2)
 
-# عرض الرسم البياني التفاعلي
-st.line_chart(chart_data)
+df = pd.DataFrame({
+    'السعر': prices,
+    'المتوسط المتحرك (SMA 5)': pd.Series(prices).rolling(5).mean(),
+    'المتوسط المتحرك (SMA 10)': pd.Series(prices).rolling(10).mean()
+}, index=dates)
 
-# جدول بيانات تفصيلي
-st.markdown("### 📋 أحدث التغيرات السعرية")
-st.dataframe(chart_data, use_container_width=True)
+# عرض القسم الرئيسي
+st.subheader(f"تحليل الأداء الحي لـ: {asset} ({timeframe})")
 
-# مؤشرات سريعة
-col1, col2, col3 = st.columns(3)
-col1.metric(label="السعر الحالي", value="$154.20", delta="+2.3%")
-col2.metric(label="حجم التداول", value="1.2B", delta="-0.5%")
-col3.metric(label="القيمة السوقية", value="$45B", delta="+1.2%")
+# المؤشرات السريعة (Metrics)
+col1, col2, col3, col4 = st.columns(4)
+col1.metric(label="السعر الحالي", value=f"${prices[-1]:.2f}", delta="+3.4%")
+col2.metric(label="أعلى سعر اليوم", value=f"${max(prices):.2f}", delta="+1.2%")
+col3.metric(label="أقل سعر اليوم", value=f"${min(prices):.2f}", delta="-0.8%")
+col4.metric(label="مؤشر القوة النسبية RSI", value="58.4", delta="محايد")
+
+# الرسم البياني المتقدم
+st.markdown("### 📉 الرسم البياني وحركة الأسعار مع المتوسطات المتحركة")
+st.line_chart(df)
+
+# جدول بيانات الأسعار
+st.markdown("### 📋 سجل الأسعار التفصيلي")
+st.dataframe(df.tail(10), use_container_width=True)
+
+st.markdown("---")
+st.caption("تم تطوير لوحة المؤشرات هذه وتحديثها بنجاح عبر الأيباد والتخزين السحابي.")
